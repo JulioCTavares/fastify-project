@@ -14,6 +14,5 @@ RUN npm ci
 
 
 
-EXPOSE 4000
 
 CMD ["npm", "run", "dev"]
