@@ -1,0 +1,35 @@
+version: "3.8"
+services:
+  pg-dev:
+    image: postgres:14.6-alpine
+    container_name: pg-dev
+    restart: unless-stopped
+    hostname: postgres
+    ports:
+      - "${DATABASE_PORT:?DATABASE_PORT env var is missing on .env file}:5432"
+    environment:
+      POSTGRES_USER: ${DATABASE_NAME:?DATABASE_NAME env var is missing on .env file}
+      POSTGRES_PASSWORD: ${DATABASE_USERNAME:?DATABASE_USERNAME env var is missing on .env file}
+      POSTGRES_DB: ${DATABASE_PASSWORD:?DATABASE_PASSWORD env var is missing on .env file}
+    volumes:
+      - ./data/db-dev:/var/lib/postgresql/data
+  app:
+    stdin_open: true
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: api-fastify
+    restart: unless-stopped
+    ports:
+      - "${PORT}:${PORT}"
+    env_file:
+      - .env
+    volumes:
+      - .:/usr/app
+    links:
+      - pg-dev
+    depends_on:
+      - pg-dev
+volumes:
+  pgdata:
+    driver: local
